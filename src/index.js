@@ -6,12 +6,26 @@ const app = express();
 
 app.use(cors());
 
+let users = {
+  1: {
+    id: '1',
+    username: 'Robin Wieruch',
+  },
+  2: {
+    id: '2',
+    username: 'Dave Davids',
+  },
+};
+
 const schema = gql`
   type Query {
     me: User
+    user(id: ID!): User
+    users: [User!]
   }
 
   type User {
+    id: ID!
     username: String!
   }
 `;
@@ -22,6 +36,12 @@ const resolvers = {
       return {
         username: 'Robin Wieruch',
       };
+    },
+    user: (parent, { id }) => {
+      return users[id];
+    },
+    users: () => {
+      return Object.values(users);
     },
   },
 };
