@@ -1,4 +1,6 @@
 import uuidv4 from 'uuid/v4';
+import { combineResolvers } from 'graphql-resolvers';
+import { isAuthenticated } from './authorization';
 
 export default {
   Query: {
@@ -10,16 +12,12 @@ export default {
     },
   },
   Mutation: {
-    createMessage: async (parent, { text }, { me, models }) => {
-      try {
-        return await models.Message.create({
-          text,
-          userId: me.id,
-        });
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
+    createMessage: combineResolvers(isAuthenticated, async (parent, { text }, { models, me }) => {
+      return await models.Message.create({
+        text,
+        userId: me.id,
+      });
+    }),
     updateMessage: (parent, { id, text }) => {
       messages[id] = {
         ...messages[id],
